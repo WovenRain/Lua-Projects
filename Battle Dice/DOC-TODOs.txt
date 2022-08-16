@@ -1,0 +1,14 @@
+TODO: endgame
+-random decisions?
+
+TODO: AI opponents
+-heuristic decisions
+-genetic algorythm and logging
+
+TODO: GUI
+-integrate
+
+TODO buffs
+-rogue
+-assassin
+-spy

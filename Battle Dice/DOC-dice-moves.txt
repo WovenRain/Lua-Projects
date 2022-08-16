@@ -1,0 +1,61 @@
+----Dice list:
+
+Fighter
+Rogue
+Cleric
+Wizard
+Merchant
+Banker
+Assassin
+Spy
+Squire
+Tank
+Knight
+Necromancer
+Mage
+Sorcerer
+Archer
+Bard
+
+----Move list:
+
+Attack
+    Add 1 to attack
+Double Atk
+    Add 2 to attack
+Defend
+    Add 1 to defend
+Double Def
+    Add 2 to defend
+Revive
+    Add 1 to revive
+Target
+    Turn kills to targeted kills
+Skip
+    after kills, choose 1 on team to go back in deck
+    as opposed to into discard
+Reroll
+    Reroll a dice
+Half Revive
+    If two in team, add 1 revive
+Weaken
+    -2 to enemy defend
+Double Income
+    *2 to income, stacks
+Add to Income
+    +1 to income, before multiples
+Empower
+    Double attack or defend
+Occlude
+    Cancel all? enemy targets
+Safe
+    Doesnt get die if killed
+    Put directly back into deck?
+Substitute
+    One killed goes into discard not grave
+Steal Revive
+    If enemy revives, take from their grave
+Attack and Defend
+    +1 atk & def
+Targeted Attack
+    +1 atk & target

@@ -1,0 +1,45 @@
+--INITIALISATION
+get player decks
+make shop
+
+--ROUND START--     Loop from here
+draw hands 
+show the player/s
+
+--SWAP OR REROLL
+choose swap or reroll
+
+--ROLL HAND
+roll the dice
+show player outcomes
+
+--REROLLS
+if either player had rerolls, start loop for more rerolls
+
+--MEASURE OUTCOMES
+calculate outcomes of dice
+
+--PREFIGHT
+players choose what to empower
+
+--FIGHT
+calculate KILLS, and outcomes
+
+--PREKILLS
+let players handle revives
+pick first shopper before kills are set back to 0
+show kill count
+
+--KILLS
+roll for death, or target
+
+--POSTKILLS
+check skips then send back to deck
+move hands to discard
+generate income
+
+--SHOP
+players buy from shop
+if shop empty or refused - endgame
+
+--CHECK FOR WINNER
