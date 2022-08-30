@@ -65,8 +65,11 @@ function playerState:starting(givenName, playerType)
         "Rogue", "Rogue", "Rogue",
         "Cleric",
         "Wizard", "Wizard", "Wizard",
-        --[[
+        
+        "Mage", "Mage",
+        "Squire", "Squire",
         "Necromancer", "Necromancer",
+        --[[
         "Mage", "Mage",
         "Squire", "Squire",
         "Spy", "Assassin", "Archer", "Bard", "Sorcerer", "Knight",
@@ -120,6 +123,7 @@ function playerState:newRound()
     self.defMult = 1
     self.incomeMult = 1
     self.addIncome = 0
+    self.swapOut = nil
     self.outcomes = {}
     self.choices = {}
     self.choiceType = nil
@@ -193,22 +197,84 @@ end
 
 function playerState:sendToGrave(x)
     --send hand[x] to grave, unless substitute
+    local s = ""
     if x < #self.hand + 1 then
         if self.substitutes > 0 then
             print(string.format("%s had a substitute. %s was saved and put in deck", self.name, self.hand[x]))
+            s = string.format("%s's %s was substituted and put in deck", self.name, self.hand[x])
             self.substitutes = self.substitutes - 1
             table.insert(self.deck, table.remove(self.hand, x))
         else
             print(string.format("%s's %s sent to grave", self.name, self.hand[x]))
+            s = string.format("%s's %s sent to grave", self.name, self.hand[x])
             table.insert(self.grave, table.remove(self.hand, x))
         end
     else
         print("Miss!")
+        s = string.format("%s had a Miss!", self.name)
     end
+    return s
 end
 
 function playerState:getIncome(x)
     self.wallet = self.wallet + (x + self.addIncome) * self.incomeMult
+end
+
+--for one at a time GUI
+function playerState:handleRevive(opponent)
+    if self.revives > 0 then
+        self.choices = {}
+        self.choiceType = "revive"
+        opponent.choices = {}
+        opponent.choiceType = "steal revive"
+        --choose revives
+        --if opponent has steal -> steal revive
+        if self.revives > 0 and opponent.steals > 0 and #self.grave > 0 then
+            --opponent steals from self grave
+            --revive steals
+            print(string.format("%s has a Steal Revive", opponent.name))
+            print("Who would you like to Revive Steal?")
+            --list all in player grave
+            for i = 1, #self.grave, 1 do
+                print(string.format("%i: %s", i, self.grave[i]))
+                --add to choices
+                opponent.choices[i] = self.grave[i]
+            end
+            --opponent choosez
+            local r = tonumber(opponent:getPlayerInput())
+            if r > #opponent.grave then
+                r = 1
+            end
+            --put it in opponent discard
+            table.insert(opponent.discard, table.remove(self.grave, r))
+            self.revives = self.revives - 1
+            opponent.steals = opponent.steals - 1
+            print(self.name)
+            print(self:stateString())
+        elseif self.revives > 0 and #self.grave > 0 then
+            --player can revive from grave to discard
+            print(string.format("%s, Pick your revive", self.name))
+            --list all in player grave
+            for i = 1, #self.grave, 1 do
+                print(string.format("%i: %s", i, self.grave[i]))
+                --add to player choices
+                self.choices[i] = self.grave[i]
+            end
+            --choose
+            local r = tonumber(self:getPlayerInput())
+            if r > #self.grave then
+                r = 1
+            end
+            --put it in discard
+            table.insert(self.discard, table.remove(self.grave, r))
+            self.revives = self.revives - 1
+        else
+            --escape while loop if nothing in grave
+            self.revives = self.revives - 1
+        end
+        print(self.name)
+        print(self:stateString())
+    end
 end
 
 --handle revives
@@ -265,6 +331,61 @@ function playerState:handleRevives(opponent)
     end
 end
 
+--one choice at a time
+--swap out or reroll
+--returns true if they swapped out
+function playerState:handleSwapOrReroll()
+    self.choices = {}
+    self.choiceType = "swap out"
+    --if empty deck put discard back in
+    if #self.deck == 0 then
+        self:discardBackToDeck()
+    end
+    --if deck still empty, cancel
+    if #self.deck == 0 then
+        print("Nothing to swap with, take a reroll")
+        self.rerolls = 1
+        return
+    end
+
+    --print options
+    for i = 1, 5, 1 do
+        --each dice in hand
+        print(string.format("%i: Swap %s", i, self.hand[i]))
+        self.choices[i] = self.hand[i]
+    end
+    self.choices[6] = "Reroll"
+    print("6: Keep reroll")
+
+    --if not 6 its a swap in
+    local c = tonumber(self:getPlayerInput())
+    if c == 6 then
+        --its a reroll
+        self.rerolls = 1
+        return false
+    else
+        self.swapOut = c
+        return true
+    end
+end
+
+function playerState:swapIn()
+    self.choices = {}
+    self.choiceType = "swap in"
+    --swap hand[c]
+    print(string.format("Swapping %s", self.hand[self.swapOut]))
+    --print whole deck
+    for i = 1, #self.deck, 1 do
+        --each dice in deck
+        print(string.format("%i: take %s", i, self.deck[i]))
+        self.choices[i] = self.deck[i]
+    end
+    local toTake = self:getPlayerInput()
+    --remove swapped
+    table.insert(self.hand, table.remove(self.deck, toTake))
+    table.insert(self.deck, table.remove(self.hand, self.swapOut))
+end
+
 --handle swap choice
 --Output to player/s
 function playerState:handleSwap()
@@ -300,6 +421,7 @@ function playerState:swapChoice()
 
     --take choice, then do
     --TODO call popup function in GUI
+    --dont like this it should be in gameloop really!!!
     if self.type == "gui" then
         --GUIPrototype:swapInPopup()
     end
@@ -423,6 +545,25 @@ function playerState:handleReroll()
     end
 end
 
+function playerState:resetPrecalculate()
+    self.attacks = 0
+    self.defends = 0
+    self.kills = 0
+    self.revives = 0
+    self.halfrev = 0
+    self.targets = 0
+    self.skips = 0
+    self.steals = 0
+    self.weakens = 0
+    self.substitutes = 0
+    self.occlude = 0
+    self.empowers = 0
+    self.atkMult = 1
+    self.defMult = 1
+    self.incomeMult = 1
+    self.addIncome = 0
+end
+
 --calculate outcomes of dice
 --[[
     each player has a number of Attacks and Defends.
@@ -431,6 +572,7 @@ end
     adds tasks that needs to be done
     ]]
 function playerState:calculate()
+    self:resetPrecalculate()
     for i = 1, 5, 1 do
         --for each outcome
         if self.outcomes[i] == "Attack" then
@@ -478,6 +620,32 @@ function playerState:calculate()
     end
 end
 
+--one at a time
+function playerState:handleEmpower()
+    if self.empowers > 0 then
+        self.choices = {}
+        self.choiceType = "empower"
+        --ask player
+        print(string.format("%s has an Empower. Choose to Double total", self.name))
+        print("1: Attacks")
+        print("2: Defends")
+        self.choices[1] = "Attacks"
+        self.choices[2] = "Defends"
+        --get choice
+        local c = tonumber(self:getPlayerInput())
+        --multiply choice
+        if c == 1 then
+            self.atkMult = self.atkMult * 2
+            self.empowers = self.empowers - 1
+        elseif c == 2 then
+            self.defMult = self.defMult * 2
+            self.empowers = self.empowers - 1
+        else
+            print("Choice out of range")
+        end
+    end
+end
+
 --input from player
 --output to player/s
 function playerState:handleEmpowers()
@@ -510,6 +678,28 @@ end
 --output to player/s
 function playerState:handleSkips()
     while self.skips > 0 and #self.hand > 0 do
+        self.choices = {}
+        self.choiceType = "skip"
+        --self puts 1 from hand into deck
+        print(string.format("%s Pick who goes back into deck", self.name))
+        for i = 1, #self.hand, 1 do
+            print(string.format("%i: %s", i, self.hand[i]))
+            self.choices[i] = self.hand
+        end
+        local s = tonumber(self:getPlayerInput())
+        if s > #self.hand then
+            --TODO clean this up, failsafe rn
+            table.insert(self.deck, table.remove(self.hand, 1))
+        else
+            table.insert(self.deck, table.remove(self.hand, s))
+        end
+        self.skips = self.skips - 1
+    end
+end
+
+--one at a time skip for playerr input
+function playerState:handleSkip()
+    if self.skips > 0 and #self.hand > 0 then
         self.choices = {}
         self.choiceType = "skip"
         --self puts 1 from hand into deck
@@ -579,9 +769,58 @@ function playerState:handleKills(opponent)
     end
 end
 
+--one at a time for targets and gui
+function playerState:handleKill(opponent)
+    local s = ""
+    if self.kills > 0 then
+        self.choices = {}
+        self.choiceType = "target"
+        if self.targets > 0 and opponent.occlude < 1 then
+            --targeted kills
+            print(string.format("%s, pick your kill", self.name))
+            for i = 1, #opponent.hand, 1 do
+                print(string.format("%i: Kill %s", i, opponent.hand[i]))
+                self.choices[i] = opponent.hand[i]
+                s = string.format("%s's %s was Target Killed\n", opponent.name, opponent.hand[i]) .. s
+            end
+            local k = tonumber(self:getPlayerInput())
+            if opponent.outcomes[k] == "Safe" then
+                -- they avoid the hit
+                print(string.format("%s's %s was Safe", opponent.name, opponent.hand[k]))
+                s = string.format("%s's %s was Safe", opponent.name, opponent.hand[k]) .. s
+            else
+                s = opponent:sendToGrave(k)
+            end
+            self.targets = self.targets - 1
+            self.kills = self.kills - 1
+        else
+            --random kills
+            if opponent.occlude > 0 then
+                print(string.format("%s has occlude", opponent.name))
+            end
+            print("Rolling for kills")
+            local r = math.random(1,6)
+            if opponent.outcomes[r] == "Safe" then
+                -- they avoid the hit
+                print(string.format("%s's %s was Safe", opponent.name, opponent.hand[r]))
+                s = string.format("%s's %s was Safe\n", opponent.name, opponent.hand[r]) .. s
+            else
+                s = opponent:sendToGrave(r)
+            end
+            self.kills = self.kills - 1
+        end
+    end
+    return s
+end
+
 function playerState:measureKills(opponent)
     --raise to 0 to avoid negative kills
     self.kills = math.max((self.attacks * self.atkMult) - math.max((opponent.defends * opponent.defMult) - self.weakens, 0),0)
+
+    --if enemy has a occlude, set targets to 0
+    if opponent.occlude > 0 then
+        self.targets = 0
+    end
 end
 
 function playerState:outcomeString()

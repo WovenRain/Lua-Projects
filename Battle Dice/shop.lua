@@ -28,10 +28,10 @@ function shop:build()
         "Sorcerer", "Sorcerer",
         "Archer", "Archer",
         "Bard", "Bard",
-        --"Cleric", "Cleric",
-        --"Fighter", "Fighter",
-        --"Rogue", "Rogue",
-        --"Wizard", "Wizard",--]]
+        "Cleric", "Cleric",
+        "Fighter", "Fighter",
+        "Rogue", "Rogue",
+        "Wizard", "Wizard",--]]
     }
     --fill the shop
     self:fillRun()
@@ -69,7 +69,8 @@ function shop:pickFirst(p1, p2)
     self.allGone = false
 end
 
---output to players
+--output to players terminal
+--show choices for AIs
 function shop:showShop(p)
     print("-------SHOP-------")
     p.choices = {}
@@ -147,7 +148,9 @@ function shop:allowBuy(p)
             break
         elseif p.wallet < cost[b] then
             --cannot afford
-            print(string.format("%s couldn't afford that. Try again", p.name))
+            --TODO make another choice?
+            print(string.format("%s couldn't afford that. %s left the shop", p.name, p.name))
+            break
         else
             shop:buy(p,b)
             break

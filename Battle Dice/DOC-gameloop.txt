@@ -36,7 +36,7 @@ roll for death, or target
 --POSTKILLS
 check skips then send back to deck
 move hands to discard
-generate income
+generate income (2 per round)
 
 --SHOP
 players buy from shop

@@ -1,0 +1,15 @@
+1
+
+TODO
+1.1 sleep/framerate limiter :D
+    main menu               
+    gameover screen
+    info button
+    keyboard esc to menu
+
+1.2 More AIs
+    choose AI vs menu
+
+1.3 two player
+
+1.4 animations
