@@ -1,0 +1,17 @@
+TODO: BUGS
+-massive refactor, cut out and clean up (we're on like 3000+ lines of mess) <----!!!
+
+TODO: AI opponents
+-basic heuristic decisions
+-genetic algorythm and logging ? 
+
+TODO: GUI
+
+TODO: overhauls/next game
+-varying opponents/campaign 
+    -on overworld
+-2 player vs
+
+TODO: Balance etc
+    same dice compliments multiplier
+    mercanary - multiply atk/def by $
