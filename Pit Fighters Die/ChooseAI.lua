@@ -20,6 +20,13 @@ function ChooseAI.load()
 	))
 
 	table.insert(buttons, newButton(
+		"Emporer",
+		function()
+			changeGametype(3)
+		end
+	))
+
+	table.insert(buttons, newButton(
 		"Main Menu",
 		function()
 			changeGametype(0)

@@ -11,7 +11,7 @@ function Menu.load()
 	table.insert(buttons, newButton(
 		"Play vs AI",
 		function()
-			changeGametype(100)
+			changeGametype(-1)
 		end
 	))
 

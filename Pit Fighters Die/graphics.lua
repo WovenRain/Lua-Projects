@@ -16,6 +16,9 @@ if boxX is 64, width is 1280 -> BoxX is scaled
 so  resolution/1280
 ie  640/1280 = 0.5
     128/1280 = 0.1
+
+dice plates are 128     (*2)
+player plates are 1024  (*16)
 ]]
 function graphics:load()
     --1280 is 64*20, 64*64 is the icon size
@@ -80,6 +83,7 @@ function graphics:load()
     --Targeted Attack
     self.targetedAttack = love.graphics.newImage("/graphics/outcomes/targetedAttack.png")
 
+    --Dice plates
     --Fighter
     self.fighter = love.graphics.newImage("/graphics/dice/fighter.png")
 
@@ -127,13 +131,64 @@ function graphics:load()
 
     --Bard
     self.bard = love.graphics.newImage("/graphics/dice/bard.png")
-    --]]
+    
+    --Player Plates 1024*1024
+    --soldierA
+    self.soldierA = love.graphics.newImage("/graphics/players/soldierA.png")
+
+    --soldierB
+    self.soldierB = love.graphics.newImage("/graphics/players/soldierB.png")
+
+    --mageA
+    self.mageA = love.graphics.newImage("/graphics/players/mageA.png")
+
+    --mageB
+    self.mageB = love.graphics.newImage("/graphics/players/mageB.png")
+    
+    --mageC
+    self.mageC = love.graphics.newImage("/graphics/players/mageC.png")
+
+    --edgy
+    self.edgy = love.graphics.newImage("/graphics/players/edgy.png")
+
+    --fool
+    self.fool = love.graphics.newImage("/graphics/players/fool.png")
+
+    --plays_1
+    self.plays_1 = love.graphics.newImage("/graphics/players/plays_1.png")
+
+    --spider
+    self.spider = love.graphics.newImage("/graphics/players/spider.png")
 end
 
 function graphics:update(dt)
     --make sure we're still scaled right once a frame
     --maybe idk
     --self.scale = love.graphics.getWidth()/1280
+end
+
+function graphics:printPlayer(player, x, y, scale)
+    --going to be boxX*4
+    scale = scale/4
+    if player == "soldierA" then
+        love.graphics.draw(self.soldierA, x, y, 0, scale*self.scaleW, scale*self.scaleW)
+    elseif player == "soldierB" then
+        love.graphics.draw(self.soldierB, x, y, 0, scale*self.scaleW, scale*self.scaleW)
+    elseif player == "mageA" then
+        love.graphics.draw(self.mageA, x, y, 0, scale*self.scaleW, scale*self.scaleW)
+    elseif player == "mageB" then
+        love.graphics.draw(self.mageB, x, y, 0, scale*self.scaleW, scale*self.scaleW)
+    elseif player == "mageC" then
+        love.graphics.draw(self.mageC, x, y, 0, scale*self.scaleW, scale*self.scaleW)
+    elseif player == "edgy" then
+        love.graphics.draw(self.edgy, x, y, 0, scale*self.scaleW, scale*self.scaleW)
+    elseif player == "fool" then
+        love.graphics.draw(self.fool, x, y, 0, scale*self.scaleW, scale*self.scaleW)
+    elseif player == "plays_1" then
+        love.graphics.draw(self.plays_1, x, y, 0, scale*self.scaleW, scale*self.scaleW)
+    elseif player == "spider" then
+        love.graphics.draw(self.spider, x, y, 0, scale*self.scaleW, scale*self.scaleW)
+    end
 end
 
 --directs from string to function
@@ -186,7 +241,7 @@ end
 function graphics:printDicePlate(dice, x, y, scale)
     --not too sure about this, looks ok I guess :/ 
     --may have to continue to play around with GUI now I've got decent plates
-    scale = scale * 0.25
+    scale = scale/4
     if dice == "Fighter" then
         love.graphics.draw(self.fighter, x, y, 0, scale*self.scaleW, scale*self.scaleW)
     elseif dice == "Rogue" then

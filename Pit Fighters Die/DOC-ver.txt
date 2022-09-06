@@ -1,4 +1,4 @@
-1
+1   Minimum viable          :D
 
 1.1 sleep/framerate limiter :D
     main menu               :D
@@ -9,6 +9,7 @@
 
 TODO
 1.2 More AIs
+        BasicAI/emperor     :D
     choose AI vs menu       :D
     player/AI Settings
         player icons        :D
@@ -16,8 +17,11 @@ TODO
     Music
 
 1.3 animations:
-    Roll
-    Endgame
-    Kill
+        Roll
+        Endgame
+        Kill
+    Improve Engame Splash
+    Improve Gameover Splash
+    Same dice compliments multiplier
 
-1.4 two player ?
+1.4 Big refactor

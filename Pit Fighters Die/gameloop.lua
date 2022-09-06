@@ -8,7 +8,7 @@ rev = 1
 ---- 0 INITIALISATION
 --get player decks
 --make shop, p1, p2
-function gameloop:initialisation(p1Name, p1Input, p2Name, p2Input)
+function gameloop:initialisation(p1Name, p1Input, p1plate, p2Name, p2Input, p2plate)
     self.round_counter = 0
     self.running = 1
     self.income = 2
@@ -23,11 +23,11 @@ function gameloop:initialisation(p1Name, p1Input, p2Name, p2Input)
     print("starting game")
     print("Please enter player 1 name: ")
     --player:starting(io.read(), "1")
-    self.p1:starting(p1Name, p1Input)
+    self.p1:starting(p1Name, p1Input, p1plate)
 
     print("Please enter player 2 name: ")
     --player2:starting(io.read(), "random")
-    self.p2:starting(p2Name, p2Input)
+    self.p2:starting(p2Name, p2Input, p2plate)
 
     self.shop = shop
     self.shop:build()

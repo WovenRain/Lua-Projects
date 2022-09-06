@@ -1,6 +1,8 @@
 function love.conf(t)
-	t.title = "Battle Dice"
+	t.title = "Pit Fighters Die"
 	t.console = true
 	t.window.width = 1024
+	--t.window.width = 1366
 	t.window.height = 640
+	--t.window.height = 768
 end

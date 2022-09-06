@@ -1,4 +1,5 @@
 require("dice")
+require("BasicAI")
 
 playerState = {}
 
@@ -56,25 +57,30 @@ function playerState:new(o)
     return o
 end
 
-function playerState:starting(givenName, playerType)
-    --AI or player controlled
-    self.type = playerType
+function playerState:starting(givenName, playerType, playerPlate)
     --generate player starting deck
     self.deck = {
-        "Fighter", "Fighter", "Fighter",
-        "Rogue", "Rogue", "Rogue",
+        "Fighter", "Fighter",
+        "Rogue", "Rogue",
         "Cleric",
-        "Wizard", "Wizard", "Wizard",
+        "Wizard", "Wizard",
         
-        "Mage", "Mage",
-        "Squire", "Squire",
-        "Necromancer", "Necromancer",
+        "Mage",
+        "Squire",
+        "Necromancer",
         --[[
         "Mage", "Mage",
         "Squire", "Squire",
-        "Spy", "Assassin", "Archer", "Bard", "Sorcerer", "Knight",
+        "Spy", "Assassin", "Archer", 
+        "Bard", "Sorcerer", "Knight",
         "Tank", "Merchant", "Banker"--]]
     }
+    --AI or player controlled
+    self.type = playerType
+    
+    self.plate = playerPlate
+    self.name = givenName
+
     --initial grave and discard are empty
     self.grave = {}
     self.discard = {}
@@ -101,7 +107,6 @@ function playerState:starting(givenName, playerType)
     self.choices = {}
     self.choiceMade = nil
     self.choiceType = nil
-    self.name = givenName
     math.randomseed(os.time())
 end
 
@@ -146,12 +151,14 @@ end
 function playerState:getPlayerInput()
     if self.type == "cmd" then
         return io.read()
+    elseif self.type == "gui" then
+        return self.choiceMade
     elseif self.type == "1" then
         return 1
     elseif self.type == "random" then
         return math.random(1, #self.choices)
-    elseif self.type == "gui" then
-        return self.choiceMade
+    elseif self.type == "basic" then
+        return BasicAI:getChoice(self)
     end
 end
 
@@ -225,12 +232,12 @@ function playerState:handleRevive(opponent)
     if self.revives > 0 then
         self.choices = {}
         self.choiceType = "revive"
-        opponent.choices = {}
-        opponent.choiceType = "steal revive"
         --choose revives
         --if opponent has steal -> steal revive
         if self.revives > 0 and opponent.steals > 0 and #self.grave > 0 then
             --opponent steals from self grave
+            opponent.choices = {}
+            opponent.choiceType = "steal revive"
             --revive steals
             print(string.format("%s has a Steal Revive", opponent.name))
             print("Who would you like to Revive Steal?")
@@ -281,6 +288,7 @@ end
 --Input from player
 --input from opponent
 --output to player/s
+--deprecated from text version
 function playerState:handleRevives(opponent)
     while self.revives > 0 do
         self.choices = {}
@@ -396,6 +404,7 @@ function playerState:handleSwap()
 end
 
 --choose whether to swap for ne in bag or keep reroll
+--deprecated from text vversion
 function playerState:swapChoice()
     self.choices = {}
     self.choiceType = "swap out"
@@ -478,6 +487,7 @@ end
 
 --input from player
 --output to the player
+--deprecated from texr version
 function playerState:handleRerolls()
     while self.rerolls > 0 do
         self.choices = {}
@@ -641,6 +651,7 @@ end
 
 --input from player
 --output to player/s
+--deprecated from text version
 function playerState:handleEmpowers()
     while self.empowers > 0 do
         self.choices = {}
@@ -669,6 +680,7 @@ end
 --handle skips
 --input from player
 --output to player/s
+--deprecated from text version
 function playerState:handleSkips()
     while self.skips > 0 and #self.hand > 0 do
         self.choices = {}
@@ -724,6 +736,7 @@ end
     ]]
 --input from player
 --output to player/s
+--deprecated from text version
 function playerState:handleKills(opponent)
     while self.kills > 0 do
         self.choices = {}

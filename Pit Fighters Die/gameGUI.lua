@@ -37,7 +37,7 @@ Animation = ""
 AnimationTimer = 0
 AnimationLength = 0
 
-function gameGUI:load(p1name,p1type,p2name,p2type)
+function gameGUI:load(p1name,p1type,p1plate,p2name,p2type,p2plate)
 	windowW = love.graphics.getWidth()
 	windowH = love.graphics.getHeight()
 	boxX = windowW/20
@@ -50,8 +50,8 @@ function gameGUI:load(p1name,p1type,p2name,p2type)
 	instructions = "Welcome, Pick to swap out dice or keep a reroll"
 	enemyKeepReroll = keepRerollButton("Keep\nReroll")
 
-	gameloop:initialisation(p1name, p1type, p2name, p2type)
-	graphics:load()
+	gameloop:initialisation(p1name, p1type, p1plate, p2name, p2type, p2plate)
+	--graphics:load()
 	--true aafter player input, set to false after decision made
 	self.inputLock = false
 
@@ -371,7 +371,7 @@ function gameGUI:skipPopup()
 	popupButtons = {}
 	for i = 1, #gameloop.p1.hand, 1 do
 		table.insert(popupButtons, popupButton(
-			"Skip "..gameloop.p1.hand[i].." past Discard",
+			"Skip "..gameloop.p1.hand[i],
 			function()
 				gameloop.p1.choiceMade = i
 				self.skipPopupOn = false
@@ -389,8 +389,8 @@ function gameGUI:printSimpleKills()
 	gameloop.p1:measureKills(gameloop.p2)
 	gameloop.p2:measureKills(gameloop.p1)
 	instructions = instructions .. "\n" .. 
-		gameloop.p1.name .. " Has " .. gameloop.p1.kills .. " Kills\n" ..
-		gameloop.p2.name .. " Has " .. gameloop.p2.kills .. " Kills\n"
+		gameloop.p1.name .. " Has " .. gameloop.p1.kills .. " Kills and " .. gameloop.p1.rerolls .. " Rerolls\n" ..
+		gameloop.p2.name .. " Has " .. gameloop.p2.kills .. " Kills and " .. gameloop.p2.rerolls .. " Rerolls"
 end
 
 function gameGUI:setAnimation(a,l)
@@ -420,7 +420,6 @@ function gameGUI:update(dt)
 
 		if Animating then
 			AnimationTimer = AnimationTimer + dt
-			--print(AnimationTimer.." : "..AnimationLength)
 			if AnimationTimer > AnimationLength then
 				Animating = false
 			end
@@ -437,11 +436,7 @@ function gameGUI:update(dt)
 		--game is over and no longer animating
 		print("Exiting GUI")
 		changeGametype(0)
-	end
-	
-	--gamestate animate/wait
-	--should all be handled here
-	if Animating then
+	elseif Animating then
 		if Animation == "Gameover" then
 			self.gameoverScreenOn = true
 		end
@@ -455,6 +450,12 @@ function gameGUI:update(dt)
 	if gameloop.p1.type == "random" then
 		--playing with fire here
 		self.inputLock = true
+	end
+
+	if self.infoScreenOn then
+		--dont allow for any more input
+		--doesnt really work
+		return
 	end
 
 	--fucked bugfix, I mean it fucking works
@@ -798,7 +799,7 @@ function gameGUI:printBagContents(bag, bagname)
 
 	--write the text in
 	love.graphics.setColor( 0, 0, 0, 1.0)
-	love.graphics.print(bagname, font, xOffset + boxX,yOffset - boxX + margin)
+	love.graphics.print(bagname, title, xOffset + boxX,yOffset - boxX + margin)
 	
 	for d = 1, #bag, 1 do
 		local dx = xOffset + margin + (((boxX + margin) * (d-1) + 1) % (contents_x-margin))
@@ -849,7 +850,7 @@ function gameGUI:printBagContentsPopup(popupInfo, player)
 
 	--write the text in
 	love.graphics.setColor( 0, 0, 0, 1.0)
-	love.graphics.print(popupInfo, font, xOffset + boxX,yOffset - boxX + margin)
+	love.graphics.print(popupInfo, title, xOffset + boxX,yOffset - boxX + margin)
 	
 	for d,dice in ipairs(popupButtons) do
 		dice.last = dice.now
@@ -880,7 +881,7 @@ function gameGUI:printHand(hand, offsetHandX, player)
 		diceH.last = diceH.now
 
 		--Dice type box
-		love.graphics.setColor(unpack(defaultColor))
+		love.graphics.setColor(unpack(inactiveButtonColor))
 		love.graphics.rectangle(
 			"fill",
 			offsetHandX,
@@ -907,7 +908,7 @@ function gameGUI:printHand(hand, offsetHandX, player)
 				love.graphics.setColor(hotButtonColor)
 				highlighter = true
 			else
-				love.graphics.setColor(defaultColor)
+				love.graphics.setColor(inactiveButtonColor)
 			end
 			love.graphics.rectangle(
 				"fill",
@@ -1089,12 +1090,12 @@ function gameGUI:printPopupMenu()
 		--write the text in
 		love.graphics.setColor( 0, 0, 0, 1.0)
 		
-		local textW = font:getWidth(button.text)
-		local textH = font:getHeight(button.text)
+		local textW = title:getWidth(button.text)
+		local textH = title:getHeight(button.text)
 		
 		love.graphics.print(
 			button.text, 
-			font, 
+			title, 
 			(windowW / 2) - (textW / 2), 
 			by + (textH / 2) - 6
 		)
@@ -1155,13 +1156,13 @@ function gameGUI:printInfoButton(bx, by)
 	local mx,my = love.mouse.getPosition()
 
 	--draw the rectangle
-	local color = {0.4, 0.4, 0.5, 1.0}
+	local color = defaultColor
 	local hot = mx > bx and mx < bx + boxX 
 			and my > by and my < by + boxX
 	
 	self.infoButton.now = love.mouse.isDown(1)
 	if hot then
-		color = {0.8, 0.8, 0.9, 1.0}
+		color = hotButtonColor
 		if self.infoButton.now and not self.infoButton.last then
 			self.infoButton.fn()
 		end
@@ -1258,6 +1259,12 @@ function gameGUI:draw()
 	--Label enemy and life
 	love.graphics.print(string.format("%s life: %i", gameloop.p2.name, gameloop.p2:getLife()),font,windowW - 4*boxX,windowH - boxX/2)
 
+	--print player plates
+	--player 1
+	graphics:printPlayer(gameloop.p1.plate, 0, boxX*8, 1)
+	--player 2
+	graphics:printPlayer(gameloop.p2.plate, windowW-boxX*4.5, boxX*8, 1)
+
 	--print instructions at bottom
 	love.graphics.setColor(defaultColor)
 	love.graphics.print(instructions,font, 3.75*boxX, 9 * boxX)
@@ -1326,15 +1333,13 @@ function gameGUI:draw()
 	--popup for revive
 	if self.revivePopupOn == true then
 		--show it
-		--self:printPopupMenu()
 		self:printBagContentsPopup("Revive from your Grave", gameloop.p1)
 	end
 
 	--popup for steal revive
 	if self.stealRevivePopupOn == true then
 		--show it
-		--self:printPopupMenu()
-		self:printBagContentsPopup("Steal Revive from opponents Grave", gameloop.p1)
+		self:printBagContentsPopup("Steal from Enemy Grave", gameloop.p1)
 	end
 
 	--popup for target
