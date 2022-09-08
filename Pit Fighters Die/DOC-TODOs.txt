@@ -13,5 +13,5 @@ TODO: overhauls/next game
 -2 player vs
 
 TODO: Balance etc
-    same dice compliments multiplier
-    mercanary - multiply atk/def by $
+-same dice compliments multiplier
+-mercanary - multiply atk/def by $

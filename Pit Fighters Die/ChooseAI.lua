@@ -41,5 +41,5 @@ function ChooseAI.update(dt)
 end
 
 function ChooseAI.draw()
-	BasicMenu.draw(buttons)
+	BasicMenu.draw("Who Will you Fight?",buttons)
 end

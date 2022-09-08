@@ -16,6 +16,13 @@ function Menu.load()
 	))
 
 	table.insert(buttons, newButton(
+		"Settings",
+		function()
+			changeGametype(-2)
+		end
+	))
+
+	table.insert(buttons, newButton(
 		"Quit",
 		function()
 			love.event.quit(0)
@@ -28,5 +35,5 @@ function Menu.update(dt)
 end
 
 function Menu.draw()
-	BasicMenu.draw(buttons)
+	BasicMenu.draw("Pit Fighters Die\nPrecursor",buttons)
 end

@@ -695,8 +695,14 @@ function gameGUI:printShopButtons()
 	--shop buttons
 	local shopY = boxX/2
 	local shopBX = boxX * 4.5
+	--I know I know its all over the place I'll sort it out some other time
+	local cost = {1,2,4,8,16}
 	for xOffset, shopB in ipairs(shopButtons) do
 		shopB.last = shopB.now
+		--check if you can afford it
+		if gameloop.p1.wallet < cost[xOffset] or shopB.text == nil then
+			shopB.active = false
+		end
 		--check if hovering mouse
 		local hovering = mouseX > shopBX and mouseX < shopBX + boxX
 			and mouseY > shopY and mouseY < shopY + boxX

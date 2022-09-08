@@ -3,6 +3,7 @@ BasicMenu = {}
 local font = nil
 local defaultColor = {0.4, 0.4, 0.5, 1.0}
 local hotColor = {0.8, 0.8, 0.9, 1.0}
+local textColour = {0.8,0.1,0.1,1}
 
 BUTTON_HEIGHT = 64
 
@@ -10,7 +11,7 @@ function BasicMenu.load()
 	font = love.graphics.newFont(32)
 end
 
-function BasicMenu.draw(buttons)
+function BasicMenu.draw(title, buttons)
 	local ww = love.graphics.getWidth()
 	local wh = love.graphics.getHeight()
 	
@@ -22,6 +23,9 @@ function BasicMenu.draw(buttons)
 	local yOffset = 0
 	
 	local mx,my = love.mouse.getPosition()
+
+	love.graphics.setColor(textColour)
+	love.graphics.print(title, font, 128, wh/2 - font:getHeight(title)*2)
 	
 	for i, button in ipairs(buttons) do
 		button.last = button.now

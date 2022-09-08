@@ -1,6 +1,6 @@
 function love.conf(t)
 	t.title = "Pit Fighters Die"
-	t.console = true
+	t.console = false
 	t.window.width = 1024
 	--t.window.width = 1366
 	t.window.height = 640

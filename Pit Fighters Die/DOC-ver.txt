@@ -11,10 +11,13 @@ TODO
 1.2 More AIs
         BasicAI/emperor     :D
     choose AI vs menu       :D
-    player/AI Settings
+    player/AI Settings      :D
         player icons        :D
         chosen decks
-    Music
+        Music
+        resolution
+    Music                   :D
+    fix shop buttons        :D
 
 1.3 animations:
         Roll
